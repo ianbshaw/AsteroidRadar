@@ -18,6 +18,8 @@ class MainFragment : Fragment() {
         val binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
+        binding.asteroidRecycler.adapter = LinearAdapter()
+
         binding.viewModel = viewModel
 
         setHasOptionsMenu(true)

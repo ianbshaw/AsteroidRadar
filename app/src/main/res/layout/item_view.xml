@@ -5,7 +5,7 @@
     <data>
         <variable
             name="property"
-            type="com.udacity.asteroidradar.api.AsteroidProperty" />
+            type="com.udacity.asteroidradar.Asteroid" />
     </data>
 
     <LinearLayout
@@ -29,14 +29,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="@{property.codename}" />
 
             <TextView
                 android:id="@+id/asteroid_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="@{property.closeApproachDate}" />
 
         </LinearLayout>
 
@@ -45,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            app:statusIcon="@{property.potentiallyHazardous}"
             app:srcCompat="@drawable/ic_status_normal" />
 
     </LinearLayout>
