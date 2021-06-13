@@ -62,11 +62,7 @@ class MainViewModel : ViewModel() {
                 val listResult = AsteroidApi.retrofitService.getAsteroids(Constants.API_KEY, formattedStartDate, formattedEndDate)
                 _asteroids.value = parseAsteroidsJsonResult(JSONObject(listResult.body()!!))
                 Log.d("TAG", _asteroids.value.toString())
-/*                if (listResult.isSuccessful && listResult.body() != null) {
-                    val result = parseStringToAsteroidList(listResult.body()!!)
-                    val aList = parseAsteroidsJsonResult(JSONObject(result.toString()))
-                    Log.d("TAG", aList.toString())
-                }*/
+
             } catch (e: Exception) {
                 _status.value = "Failure: ${e.message}"
             }
