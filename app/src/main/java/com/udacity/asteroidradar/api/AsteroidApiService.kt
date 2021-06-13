@@ -28,7 +28,8 @@ interface AsteroidApiService {
     suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String): PictureOfDay
 
     @GET("neo/rest/v1/feed")
-    suspend fun getAsteroids(@Query("api_key") apiKey: String,
+    suspend fun getAsteroids(@Query("filter") type: String,
+                             @Query("api_key") apiKey: String,
                              @Query("start_date") startDate: String,
                              @Query("end_date") endDate: String): Response<String>
 }
@@ -37,4 +38,8 @@ object AsteroidApi {
     val retrofitService : AsteroidApiService by lazy {
         retrofit.create(AsteroidApiService::class.java)
     }
+}
+
+enum class AsteroidApiFilter(val value: String) {
+    SHOW_DAY("day"), SHOW_WEEK("week"), SHOW_SAVED("saved"), SHOW_ALL("all")
 }

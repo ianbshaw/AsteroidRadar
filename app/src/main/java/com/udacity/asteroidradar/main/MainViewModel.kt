@@ -9,12 +9,11 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApi
+import com.udacity.asteroidradar.api.AsteroidApiFilter
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
-import com.udacity.asteroidradar.api.parseStringToAsteroidList
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Response
+import retrofit2.http.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,6 +31,10 @@ class MainViewModel : ViewModel() {
     val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
 
+    private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
+    val navigateToSelectedProperty: LiveData<Asteroid>
+        get() = _navigateToSelectedAsteroid
+
     init {
         getPicOfTheDay()
         //getAsteroidProperties()
@@ -40,15 +43,15 @@ class MainViewModel : ViewModel() {
     private fun getPicOfTheDay() {
         viewModelScope.launch {
             val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(Constants.API_KEY)
-            Log.d("TAG", potdResult.url)
+            //Log.d("TAG", potdResult.url)
             if (potdResult.mediaType != "video") {
                 _potd.value = potdResult
             }
-            getAsteroidProperties()
+            getAsteroidProperties(AsteroidApiFilter.SHOW_ALL)
         }
     }
 
-    suspend fun getAsteroidProperties() {
+    private fun getAsteroidProperties(filter: AsteroidApiFilter) {
         viewModelScope.launch {
             try {
                 val startDate = Calendar.getInstance().time
@@ -57,15 +60,29 @@ class MainViewModel : ViewModel() {
                 val fmt = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
                 val formattedStartDate = fmt.format(startDate)
                 val formattedEndDate = fmt.format(endDate.time)
-                Log.d("TAG", formattedStartDate)
-                Log.d("TAG", formattedEndDate)
-                val listResult = AsteroidApi.retrofitService.getAsteroids(Constants.API_KEY, formattedStartDate, formattedEndDate)
+                //Log.d("TAG", formattedStartDate)
+                //Log.d("TAG", formattedEndDate)
+                val listResult =
+                    AsteroidApi.retrofitService.getAsteroids(filter.value ,Constants.API_KEY,
+                        formattedStartDate, formattedEndDate)
                 _asteroids.value = parseAsteroidsJsonResult(JSONObject(listResult.body()!!))
-                Log.d("TAG", _asteroids.value.toString())
+                //Log.d("TAG", _asteroids.value.toString())
 
             } catch (e: Exception) {
                 _status.value = "Failure: ${e.message}"
             }
         }
+    }
+
+    fun displayAsteroidDetails(asteroid: Asteroid) {
+        _navigateToSelectedAsteroid.value = asteroid
+    }
+
+    fun displayAsteroidDetailsComplete() {
+        _navigateToSelectedAsteroid.value = null
+    }
+
+    fun updateFilter(filter: AsteroidApiFilter) {
+        getAsteroidProperties(filter)
     }
 }
