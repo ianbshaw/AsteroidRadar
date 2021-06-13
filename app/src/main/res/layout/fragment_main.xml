@@ -28,6 +28,7 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
+                android:src="@drawable/placeholder_picture_of_day"
                 app:imgUrl="@{viewModel.potd.url}"/>
 
             <TextView
@@ -56,8 +57,7 @@
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/item_view"
             app:listData="@{viewModel.asteroids}"
-            android:clipToPadding="false"
-            />
+            android:clipToPadding="false"/>
 
         <ProgressBar
             android:id="@+id/status_loading_wheel"

@@ -10,7 +10,11 @@ import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.api.parseStringToAsteroidList
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,14 +33,24 @@ class MainViewModel : ViewModel() {
         get() = _asteroids
 
     init {
-        getAsteroidProperties()
+        getPicOfTheDay()
+        //getAsteroidProperties()
     }
 
-    private fun getAsteroidProperties() {
+    private fun getPicOfTheDay() {
+        viewModelScope.launch {
+            val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(Constants.API_KEY)
+            Log.d("TAG", potdResult.url)
+            if (potdResult.mediaType != "video") {
+                _potd.value = potdResult
+            }
+            getAsteroidProperties()
+        }
+    }
+
+    suspend fun getAsteroidProperties() {
         viewModelScope.launch {
             try {
-                val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay()
-                _potd.value = potdResult
                 val startDate = Calendar.getInstance().time
                 val endDate = Calendar.getInstance()
                 endDate.add(Calendar.DAY_OF_YEAR, Constants.DEFAULT_END_DATE_DAYS)
@@ -45,9 +59,14 @@ class MainViewModel : ViewModel() {
                 val formattedEndDate = fmt.format(endDate.time)
                 Log.d("TAG", formattedStartDate)
                 Log.d("TAG", formattedEndDate)
-                val listResult = AsteroidApi.retrofitService.getAsteroids("6fk1mdLgLPWyLKZgcfqIfX2bd0Pk67YX6K5zLAZ0", formattedStartDate, formattedEndDate)
-                Log.d("TAG", listResult.toString())
-                _asteroids.value = parseAsteroidsJsonResult(listResult)
+                val listResult = AsteroidApi.retrofitService.getAsteroids(Constants.API_KEY, formattedStartDate, formattedEndDate)
+                _asteroids.value = parseAsteroidsJsonResult(JSONObject(listResult.body()!!))
+                Log.d("TAG", _asteroids.value.toString())
+/*                if (listResult.isSuccessful && listResult.body() != null) {
+                    val result = parseStringToAsteroidList(listResult.body()!!)
+                    val aList = parseAsteroidsJsonResult(JSONObject(result.toString()))
+                    Log.d("TAG", aList.toString())
+                }*/
             } catch (e: Exception) {
                 _status.value = "Failure: ${e.message}"
             }
