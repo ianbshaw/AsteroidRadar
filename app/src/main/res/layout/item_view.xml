@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:contentDescription="@string/not_hazardous_asteroid_image"
+            android:contentDescription="@{asteroid.potentiallyHazardous ? @string/potentially_hazardous_asteroid_image : @string/not_hazardous_asteroid_image}"
             app:statusIcon="@{asteroid.potentiallyHazardous}"
             app:srcCompat="@drawable/ic_status_normal" />
 

@@ -1,5 +1,7 @@
 package com.udacity.asteroidradar
 
+import android.icu.number.NumberFormatter.with
+import android.icu.number.NumberRangeFormatter.with
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -14,7 +16,6 @@ fun bindImage(imgView: ImageView, imgUrl: String?) {
         val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
         Picasso.get().load(imgUri).into(imgView)
     }
-    //Picasso.get().load(imgUrl).into(imgView)
 }
 
 @BindingAdapter("statusIcon")

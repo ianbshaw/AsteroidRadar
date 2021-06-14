@@ -43,8 +43,10 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
     suspend fun refreshAsteroids(startDate: String, endDate: String) {
         withContext(Dispatchers.IO) {
 
+            val key = Constants.API_KEY
+
             val jsonResult = AsteroidApi.retrofitService.getAsteroids(AsteroidFilter.ALL,
-                Constants.API_KEY, startDate, endDate)
+                key, startDate, endDate)
 
             val asteroids = parseAsteroidsJsonResult(JSONObject(jsonResult))
             val listAsteroidDatabase = mutableListOf<DatabaseAsteroid>()

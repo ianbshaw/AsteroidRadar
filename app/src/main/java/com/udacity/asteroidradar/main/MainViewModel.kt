@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.main
 
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
@@ -44,9 +45,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getPicOfTheDay() {
         viewModelScope.launch {
-            asteroidRepository.refreshAsteroids(LocalDate.now().toString(), LocalDate.now().plusDays(7).toString())
-            val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(Constants.API_KEY)
-            //Log.d("TAG", potdResult.url)
+            try {
+                asteroidRepository.refreshAsteroids(LocalDate.now().toString(), LocalDate.now().plusDays(7).toString())
+            } catch (e: Exception) {
+                Log.e("TAG", e.message!!)
+            }
+
+            val key = Constants.API_KEY
+            val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(key)
             if (potdResult.mediaType != "video") {
                 _potd.value = potdResult
             }
