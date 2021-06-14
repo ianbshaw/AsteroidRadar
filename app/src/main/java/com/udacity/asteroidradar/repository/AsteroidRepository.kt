@@ -1,6 +1,7 @@
 package com.udacity.asteroidradar.repository
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -15,6 +16,7 @@ import com.udacity.asteroidradar.main.AsteroidFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.lang.Exception
 import java.time.LocalDate
 
 class AsteroidRepository(private val database: AsteroidDatabase) {
@@ -60,7 +62,12 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
                 listAsteroidDatabase.add(databaseAsteroid)
             }
 
-            database.asteroidDao.insertAll(*listAsteroidDatabase.toTypedArray())
+            try {
+                database.asteroidDao.insertAll(*listAsteroidDatabase.toTypedArray())
+            } catch (e: Exception) {
+                Log.e("TAG", e.message!!)
+            }
+
 
         }
     }
