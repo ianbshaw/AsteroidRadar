@@ -1,37 +1,49 @@
 package com.udacity.asteroidradar.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.AsteroidApi
-import com.udacity.asteroidradar.api.AsteroidApiFilter
-import com.udacity.asteroidradar.api.AsteroidHelper
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.database.DatabaseAsteroid
 import com.udacity.asteroidradar.database.asDomainModel
-import com.udacity.asteroidradar.network.NetworkAsteroidContainer
-import com.udacity.asteroidradar.network.asDatabaseModel
-import kotlinx.coroutines.Deferred
+import com.udacity.asteroidradar.main.AsteroidFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import retrofit2.await
-import java.lang.Exception
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
 
 class AsteroidRepository(private val database: AsteroidDatabase) {
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val startDate = LocalDate.now()
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val endDate = startDate.plusDays(7)
+
     val asteroids: LiveData<List<Asteroid>> = Transformations.map(database.asteroidDao.getAsteroids()) {
+        it.asDomainModel()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val todaysAsteroids: LiveData<List<Asteroid>> = Transformations.map(
+        database.asteroidDao.getTodaysAsteroids(startDate.toString())) {
+        it.asDomainModel()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val weeksAsteroids: LiveData<List<Asteroid>> = Transformations.map(
+        database.asteroidDao.getWeeksAsteroids(startDate.toString(), endDate.toString())) {
         it.asDomainModel()
     }
 
     suspend fun refreshAsteroids(startDate: String, endDate: String) {
         withContext(Dispatchers.IO) {
 
-            val jsonResult = AsteroidApi.retrofitService.getAsteroids(AsteroidApiFilter.SHOW_ALL.value,
+            val jsonResult = AsteroidApi.retrofitService.getAsteroids(AsteroidFilter.ALL,
                 Constants.API_KEY, startDate, endDate)
 
             val asteroids = parseAsteroidsJsonResult(JSONObject(jsonResult))
@@ -47,14 +59,6 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
             }
 
             database.asteroidDao.insertAll(*listAsteroidDatabase.toTypedArray())
-
-            /*try {
-                val list = NetworkAsteroidContainer(asteroids)
-
-                database.asteroidDao.insertAll(*list.asDatabaseModel())
-            }catch (e: Exception){
-                println(e.message)
-            }*/
 
         }
     }

@@ -7,6 +7,7 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.Constants.BASE_URL
 import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.main.AsteroidFilter
 import com.udacity.asteroidradar.network.NetworkAsteroidContainer
 import kotlinx.coroutines.Deferred
 import org.json.JSONObject
@@ -34,26 +35,14 @@ interface AsteroidApiService {
     suspend fun getPictureOfTheDay(@Query("api_key") apiKey: String): PictureOfDay
 
     @GET("neo/rest/v1/feed")
-    suspend fun getAsteroids(@Query("filter") type: String,
+    suspend fun getAsteroids(@Query("filter") type: AsteroidFilter,
                              @Query("api_key") apiKey: String,
                              @Query("start_date") startDate: String,
                              @Query("end_date") endDate: String): String
-
-    suspend fun getContainer(asteroidList: List<Asteroid>) : Deferred<NetworkAsteroidContainer>
 }
 
 object AsteroidApi {
     val retrofitService : AsteroidApiService by lazy {
         retrofit.create(AsteroidApiService::class.java)
     }
-}
-
-class AsteroidHelper(private val apiService: AsteroidApi,
-                     private val startDate: String, private val endDate: String) {
-    suspend fun getAsteroidList() = apiService.retrofitService.getAsteroids(
-        AsteroidApiFilter.SHOW_ALL.value, Constants.API_KEY, startDate, endDate)
-}
-
-enum class AsteroidApiFilter(val value: String) {
-    SHOW_DAY("day"), SHOW_WEEK("week"), SHOW_SAVED("saved"), SHOW_ALL("all")
 }

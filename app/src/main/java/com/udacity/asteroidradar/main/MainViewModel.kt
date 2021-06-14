@@ -1,24 +1,22 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApi
-import com.udacity.asteroidradar.api.AsteroidApiFilter
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.launch
-import org.json.JSONObject
-import retrofit2.http.Query
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val asteroidFilter = MutableLiveData(AsteroidFilter.ALL)
 
     private val database = getDatabase(application)
     private val asteroidRepository = AsteroidRepository(database)
@@ -27,25 +25,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val potd: LiveData<PictureOfDay>
         get() = _potd
 
-    private val _status = MutableLiveData<String>()
-    val status: LiveData<String>
-        get() = _status
-
-    /*private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids*/
-
     private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
     val navigateToSelectedProperty: LiveData<Asteroid>
         get() = _navigateToSelectedAsteroid
 
     init {
         getPicOfTheDay()
-        //getAsteroidProperties()
     }
 
-    var asteroids: LiveData<List<Asteroid>> = asteroidRepository.asteroids
+    var asteroids = Transformations.switchMap(asteroidFilter) {
+        when (it!!) {
+            AsteroidFilter.WEEK -> asteroidRepository.weeksAsteroids
+            AsteroidFilter.DAY -> asteroidRepository.todaysAsteroids
+            else -> asteroidRepository.asteroids
+        }
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getPicOfTheDay() {
         viewModelScope.launch {
             asteroidRepository.refreshAsteroids(LocalDate.now().toString(), LocalDate.now().plusDays(7).toString())
@@ -53,30 +49,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             //Log.d("TAG", potdResult.url)
             if (potdResult.mediaType != "video") {
                 _potd.value = potdResult
-            }
-            //getAsteroidProperties(AsteroidApiFilter.SHOW_ALL)
-        }
-    }
-
-    private fun getAsteroidProperties(filter: AsteroidApiFilter) {
-        viewModelScope.launch {
-            try {
-                val startDate = Calendar.getInstance().time
-                val endDate = Calendar.getInstance()
-                endDate.add(Calendar.DAY_OF_YEAR, Constants.DEFAULT_END_DATE_DAYS)
-                val fmt = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
-                val formattedStartDate = fmt.format(startDate)
-                val formattedEndDate = fmt.format(endDate.time)
-                //Log.d("TAG", formattedStartDate)
-                //Log.d("TAG", formattedEndDate)
-                val listResult =
-                    AsteroidApi.retrofitService.getAsteroids(filter.value ,Constants.API_KEY,
-                        formattedStartDate, formattedEndDate)
-                //_asteroids.value = parseAsteroidsJsonResult(JSONObject(listResult.body()!!))
-                //Log.d("TAG", _asteroids.value.toString())
-
-            } catch (e: Exception) {
-                _status.value = "Failure: ${e.message}"
             }
         }
     }
@@ -89,7 +61,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _navigateToSelectedAsteroid.value = null
     }
 
-    fun updateFilter(filter: AsteroidApiFilter) {
-        getAsteroidProperties(filter)
+    fun updateFilter(filter: AsteroidFilter) {
+        asteroidFilter.value = filter
     }
+}
+
+enum class AsteroidFilter {
+    ALL, WEEK, DAY, SAVE
 }
