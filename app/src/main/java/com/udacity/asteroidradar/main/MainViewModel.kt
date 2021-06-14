@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.http.Query
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,9 +31,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val status: LiveData<String>
         get() = _status
 
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
+    /*private val _asteroids = MutableLiveData<List<Asteroid>>()
     val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
+        get() = _asteroids*/
 
     private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
     val navigateToSelectedProperty: LiveData<Asteroid>
@@ -43,17 +44,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         //getAsteroidProperties()
     }
 
-   // val asteroids = asteroidRepository.asteroids
+    var asteroids: LiveData<List<Asteroid>> = asteroidRepository.asteroids
 
     private fun getPicOfTheDay() {
         viewModelScope.launch {
-            //asteroidRepository.refreshAsteroids()
+            asteroidRepository.refreshAsteroids(LocalDate.now().toString(), LocalDate.now().plusDays(7).toString())
             val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(Constants.API_KEY)
             //Log.d("TAG", potdResult.url)
             if (potdResult.mediaType != "video") {
                 _potd.value = potdResult
             }
-            getAsteroidProperties(AsteroidApiFilter.SHOW_ALL)
+            //getAsteroidProperties(AsteroidApiFilter.SHOW_ALL)
         }
     }
 
@@ -71,7 +72,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val listResult =
                     AsteroidApi.retrofitService.getAsteroids(filter.value ,Constants.API_KEY,
                         formattedStartDate, formattedEndDate)
-                _asteroids.value = parseAsteroidsJsonResult(JSONObject(listResult.body()!!))
+                //_asteroids.value = parseAsteroidsJsonResult(JSONObject(listResult.body()!!))
                 //Log.d("TAG", _asteroids.value.toString())
 
             } catch (e: Exception) {
