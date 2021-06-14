@@ -1,23 +1,26 @@
 package com.udacity.asteroidradar.main
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApi
 import com.udacity.asteroidradar.api.AsteroidApiFilter
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.http.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val database = getDatabase(application)
+    private val asteroidRepository = AsteroidRepository(database)
 
     private val _potd = MutableLiveData<PictureOfDay>()
     val potd: LiveData<PictureOfDay>
@@ -40,8 +43,11 @@ class MainViewModel : ViewModel() {
         //getAsteroidProperties()
     }
 
+   // val asteroids = asteroidRepository.asteroids
+
     private fun getPicOfTheDay() {
         viewModelScope.launch {
+            //asteroidRepository.refreshAsteroids()
             val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(Constants.API_KEY)
             //Log.d("TAG", potdResult.url)
             if (potdResult.mediaType != "video") {

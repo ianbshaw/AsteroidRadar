@@ -24,7 +24,7 @@ class LinearAdapter(val onClickListener: OnClickListener) : ListAdapter<Asteroid
 
     class AsteroidViewHolder(private val binding: ItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(asteroid: Asteroid) {
-            binding.property = asteroid
+            binding.asteroid = asteroid
             binding.executePendingBindings()
         }
     }

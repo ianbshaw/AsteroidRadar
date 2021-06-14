@@ -9,9 +9,9 @@ object Constants {
     const val BASE_URL = "https://api.nasa.gov/"
     const val API_KEY = "6fk1mdLgLPWyLKZgcfqIfX2bd0Pk67YX6K5zLAZ0"
 
-    val startDate = Calendar.getInstance().time
-    val endDate = Calendar.getInstance().add(Calendar.DAY_OF_YEAR, Constants.DEFAULT_END_DATE_DAYS)
-    val fmt = SimpleDateFormat(API_QUERY_DATE_FORMAT, Locale.getDefault())
+    private val startDate = Calendar.getInstance().time
+    private val endDate = Calendar.getInstance().add(Calendar.DAY_OF_YEAR, DEFAULT_END_DATE_DAYS)
+    private val fmt = SimpleDateFormat(API_QUERY_DATE_FORMAT, Locale.getDefault())
     val F_START_DATE = fmt.format(startDate)
     val F_END_DATE = fmt.format(endDate)
 }
