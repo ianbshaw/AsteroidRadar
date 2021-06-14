@@ -31,7 +31,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         get() = _navigateToSelectedAsteroid
 
     init {
-        getPicOfTheDay()
+        try {
+            getPicOfTheDay()
+        }catch (e: java.lang.Exception) {
+            Log.e("TAG", e.message!!)
+        }
+
     }
 
     var asteroids = Transformations.switchMap(asteroidFilter) {
@@ -47,14 +52,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 asteroidRepository.refreshAsteroids(LocalDate.now().toString(), LocalDate.now().plusDays(7).toString())
+                val key = Constants.API_KEY
+                val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(key)
+                if (potdResult.mediaType != "video") {
+                    _potd.value = potdResult
+                }
             } catch (e: Exception) {
                 Log.e("TAG", e.message!!)
-            }
-
-            val key = Constants.API_KEY
-            val potdResult = AsteroidApi.retrofitService.getPictureOfTheDay(key)
-            if (potdResult.mediaType != "video") {
-                _potd.value = potdResult
             }
         }
     }
