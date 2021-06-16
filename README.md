@@ -8,14 +8,6 @@ Asteroid Radar is an app to view the asteroids detected by NASA that pass near E
 
 The app is consists of two screens: A Main screen with a list of all the detected asteroids and a Details screen that is going to display the data of that asteroid once it´s selected in the Main screen list. The main screen will also show the NASA image of the day to make the app more striking.
 
-This kind of app is one of the most usual in the real world, what you will learn by doing this are some of the most fundamental skills you need to know to work as a professional Android developer, as fetching data from the internet, saving data to a database, and display the data in a clear, clear, compelling UI.
-
-### Screenshots
-
-![Screenshot 1](starter/screenshots/screen_1.png)
-![Screenshot 2](starter/screenshots/screen_2.png)
-![Screenshot 3](starter/screenshots/screen_3.png)
-![Screenshot 4](starter/screenshots/screen_4.png)
 
 ### Dependencies
 
@@ -66,7 +58,7 @@ To get the project running on your local machine, you need to follow these steps
 
 Use this to clone it to your local machine:
 ```bash
-git clone https://github.com/udacity/REPOSITORY_NAME.git
+git clone https://github.com/ianbshaw/REPOSITORY_NAME.git
 ```
 
 **Step 2: Check out the ‘master’ branch**
