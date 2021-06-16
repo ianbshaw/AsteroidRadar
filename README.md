@@ -84,17 +84,14 @@ Explain what each test does and why
 ```
 Examples here
 ```
-## Project Instructions
 
-You will be provided with a starter code, which includes the necessary dependencies and plugins that you have been using along the courses and that you are going to need to complete this project. 
+## Built With
 
 The most important dependencies we are using are:
 - Retrofit to download the data from the Internet.
 - Moshi to convert the JSON data we are downloading to usable data in form of custom classes.
 - Glide to download and cache images.
 - RecyclerView to display the asteroids in a list.
-
-## Built With
 
 This project uses the NASA NeoWS (Near Earth Object Web Service) API, which you can find here.
 https://api.nasa.gov/
